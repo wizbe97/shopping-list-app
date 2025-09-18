@@ -1,29 +1,29 @@
 import {
-    createUserWithEmailAndPassword,
-    onAuthStateChanged,
-    signInWithEmailAndPassword,
-    updateProfile,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import {
-    addDoc,
-    collection,
-    onSnapshot,
-    query,
-    Timestamp,
-    where,
+  addDoc,
+  collection,
+  onSnapshot,
+  query,
+  Timestamp,
+  where,
 } from "firebase/firestore";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    Button,
-    Dimensions,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Button,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import AuthDrawer from "../components/AuthDrawer";
 import { auth, db } from "../src/firebaseConfig";
@@ -55,7 +55,9 @@ export default function Home() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [addingInline, setAddingInline] = useState(false);
   const [newHouseholdName, setNewHouseholdName] = useState("");
-  const [selectedHouseholdId, setSelectedHouseholdId] = useState<string | null>(null);
+  const [selectedHouseholdId, setSelectedHouseholdId] = useState<string | null>(
+    null
+  );
 
   const selectedHousehold = useMemo(
     () => households.find((h) => h.id === selectedHouseholdId) ?? null,
@@ -228,7 +230,7 @@ export default function Home() {
           {dropdownOpen && (
             <View style={[styles.dropdownPanel, { width: BLOCK_WIDTH }]}>
               {households
-                .filter((h) => h.id !== selectedHouseholdId) // hide current household
+                .filter((h) => h.id !== selectedHouseholdId)
                 .map((h) => (
                   <Pressable
                     key={h.id}
@@ -273,6 +275,7 @@ export default function Home() {
           )}
         </View>
 
+        {/* profile icon is absolutely positioned */}
         <TouchableOpacity
           style={styles.profileBtn}
           onPress={() => setDrawerOpen(true)}
@@ -321,12 +324,11 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   topRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingTop: 24,
     paddingHorizontal: 16,
-    justifyContent: "space-between",
   },
-  householdArea: { alignItems: "center" },
+  householdArea: { flex: 1, alignItems: "center" },
   householdButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -339,7 +341,7 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
   },
   householdSelected: {
-    backgroundColor: "#f2f2f2", // highlight selected at top
+    backgroundColor: "#f2f2f2",
   },
   householdText: {
     fontSize: 16,
@@ -363,7 +365,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#f0f0f0",
   },
   dropdownHover: {
-    backgroundColor: "#f9f9f9", // hover/press feedback
+    backgroundColor: "#f9f9f9",
   },
   addRow: {
     paddingVertical: 10,
@@ -388,7 +390,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginRight: 8,
   },
-  profileBtn: { width: 32, alignItems: "flex-end" },
+  profileBtn: {
+    position: "absolute",
+    top: 24,
+    right: 16,
+  },
   inviteWrap: { alignItems: "center", marginTop: 12 },
   tilesRow: {
     marginTop: 24,
