@@ -14,12 +14,16 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
   const [password, setPassword] = useState("");
 
   async function handleSubmit() {
-    if (isRegister) {
-      await register(name, email, password);
-    } else {
-      await login(email, password);
+    try {
+      if (isRegister) {
+        await register(name, email, password);
+      } else {
+        await login(email, password);
+      }
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      console.error("Auth error:", err);
     }
-    if (onSuccess) onSuccess();
   }
 
   return (
@@ -50,7 +54,9 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
         />
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>{isRegister ? "Register" : "Login"}</Text>
+          <Text style={styles.buttonText}>
+            {isRegister ? "Register" : "Login"}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -58,7 +64,9 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
           style={styles.toggle}
         >
           <Text style={styles.toggleText}>
-            {isRegister ? "Already have an account? Login" : "Need an account? Register"}
+            {isRegister
+              ? "Already have an account? Login"
+              : "Need an account? Register"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -71,7 +79,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff", // matches your white background
+    backgroundColor: "#fff",
   },
   card: {
     width: "85%",

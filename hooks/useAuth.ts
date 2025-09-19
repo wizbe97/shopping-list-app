@@ -15,13 +15,12 @@ export function useAuth() {
     const unsub = onAuthStateChanged(auth, async (u) => {
       if (u) {
         try {
-          // ✅ Always reload to get the latest displayName
-          await u.reload();
+          await u.reload(); // refresh to ensure displayName is up-to-date
         } catch (err) {
           console.warn("Failed to reload user", err);
         }
         setUserId(u.uid);
-        setUserName(u.displayName ?? u.email ?? "Friend");
+        setUserName(u.displayName?.trim() || u.email || "Friend");
       } else {
         setUserId(null);
         setUserName(null);
@@ -40,11 +39,13 @@ export function useAuth() {
       email.trim(),
       password
     );
+
     if (cred.user && name.trim()) {
+      // ✅ update profile with display name
       await updateProfile(cred.user, { displayName: name.trim() });
       await cred.user.reload();
 
-      // ✅ Immediately update local state so UI shows name instead of email
+      // immediately sync state so UI updates without needing refresh
       setUserId(cred.user.uid);
       setUserName(name.trim());
     }
