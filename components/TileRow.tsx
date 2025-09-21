@@ -5,8 +5,15 @@ export default function TileRow() {
   return (
     <View style={styles.wrapper}>
       <View style={styles.row}>
-        <View style={styles.tile}><Text>🍲 Recipes</Text></View>
-        <View style={styles.tile}><Text>🛒 Shopping List</Text></View>
+        {/* Shopping List on the left */}
+        <View style={styles.tile}>
+          <Text>🛒 Shopping List</Text>
+        </View>
+
+        {/* Recipes on the right */}
+        <View style={styles.tile}>
+          <Text>🍲 Recipes</Text>
+        </View>
       </View>
     </View>
   );
@@ -22,5 +29,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 8,
     alignItems: "center",
+    justifyContent: "center",
   },
 });
