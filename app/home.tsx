@@ -1,3 +1,4 @@
+// app/home.tsx
 import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import AuthDrawer from "../components/AuthDrawer";
@@ -5,6 +6,7 @@ import AuthForm from "../components/AuthForm";
 import HomeHeader from "../components/HomeHeader";
 import InviteButton from "../components/InviteButton";
 import TileRow from "../components/TileRow";
+import { HouseholdProvider } from "../context/HouseholdContext";
 import { useAuth } from "../hooks/useAuth";
 
 export default function Home() {
@@ -16,20 +18,22 @@ export default function Home() {
   }
 
   return (
-    <View style={styles.container}>
-      <HomeHeader onProfilePress={() => setDrawerOpen(true)} userId={userId} />
+    <HouseholdProvider userId={userId}>
+      <View style={styles.container}>
+        <HomeHeader onProfilePress={() => setDrawerOpen(true)} />
 
-      <InviteButton />
+        <InviteButton />
 
-      <TileRow />
+        <TileRow />
 
-      <AuthDrawer
-        isOpen={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        userName={userName}
-        onLoggedOut={() => {}}
-      />
-    </View>
+        <AuthDrawer
+          isOpen={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          userName={userName}
+          onLoggedOut={() => {}}
+        />
+      </View>
+    </HouseholdProvider>
   );
 }
 

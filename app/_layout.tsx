@@ -1,7 +1,14 @@
+// app/_layout.tsx
 import { Stack } from "expo-router";
+import { HouseholdProvider } from "../context/HouseholdContext";
+import { useAuth } from "../hooks/useAuth";
 
-export default function Layout() {
+export default function RootLayout() {
+  const { userId } = useAuth();
+
   return (
-    <Stack screenOptions={{ headerShown: false }} />
+    <HouseholdProvider userId={userId}>
+      <Stack screenOptions={{ headerShown: false }} />
+    </HouseholdProvider>
   );
 }

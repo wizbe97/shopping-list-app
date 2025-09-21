@@ -1,15 +1,23 @@
+// app/recipes/create.tsx
 import { useRouter } from "expo-router";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 import React, { useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useHouseholdContext } from "../../context/HouseholdContext";
 import { useAuth } from "../../hooks/useAuth";
-import { useHouseholds } from "../../hooks/useHouseholds";
 import { db } from "../../src/firebaseConfig";
 
 export default function CreateRecipeScreen() {
   const router = useRouter();
   const { userId } = useAuth();
-  const { selectedId: householdId } = useHouseholds(userId);
+  const { selectedId: householdId } = useHouseholdContext();
 
   const [name, setName] = useState("");
   const [serves, setServes] = useState("");
@@ -21,7 +29,9 @@ export default function CreateRecipeScreen() {
   }
 
   function updateIngredient(index: number, value: string) {
-    setIngredients((prev) => prev.map((item, i) => (i === index ? value : item)));
+    setIngredients((prev) =>
+      prev.map((item, i) => (i === index ? value : item))
+    );
   }
 
   function addStep() {
@@ -41,9 +51,10 @@ export default function CreateRecipeScreen() {
       ingredients: ingredients.filter((i) => i.trim() !== ""),
       steps: steps.filter((s) => s.trim() !== ""),
       createdAt: Timestamp.now(),
+      createdBy: userId,
     });
 
-    router.replace("/recipes"); // ✅ back to list
+    router.replace("/recipes");
   }
 
   return (

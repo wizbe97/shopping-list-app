@@ -1,24 +1,25 @@
+// app/recipes/[id].tsx
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { doc, getDoc, Timestamp, updateDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { useHouseholdContext } from "../../context/HouseholdContext";
 import { useAuth } from "../../hooks/useAuth";
-import { useHouseholds } from "../../hooks/useHouseholds";
 import { db } from "../../src/firebaseConfig";
 
 export default function EditRecipeScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { userId } = useAuth();
-  const { selectedId: householdId } = useHouseholds(userId);
+  const { selectedId: householdId } = useHouseholdContext();
 
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
@@ -48,7 +49,9 @@ export default function EditRecipeScreen() {
   }
 
   function updateIngredient(index: number, value: string) {
-    setIngredients((prev) => prev.map((item, i) => (i === index ? value : item)));
+    setIngredients((prev) =>
+      prev.map((item, i) => (i === index ? value : item))
+    );
   }
 
   function addStep() {
@@ -69,9 +72,10 @@ export default function EditRecipeScreen() {
       ingredients: ingredients.filter((i) => i.trim() !== ""),
       steps: steps.filter((s) => s.trim() !== ""),
       updatedAt: Timestamp.now(),
+      updatedBy: userId,
     });
 
-    router.replace("/recipes"); // ✅ back to list
+    router.replace("/recipes");
   }
 
   if (loading) {

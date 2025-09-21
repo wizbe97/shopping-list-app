@@ -1,17 +1,17 @@
+// components/HomeHeader.tsx
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import HouseholdDropdown from "./HouseholdDropdown";
 
 type Props = {
   onProfilePress: () => void;
-  userId: string;
 };
 
-export default function HomeHeader({ onProfilePress, userId }: Props) {
+export default function HomeHeader({ onProfilePress }: Props) {
   return (
     <View style={styles.topRow}>
       <View style={styles.dropdownWrapper}>
-        <HouseholdDropdown userId={userId} />
+        <HouseholdDropdown />
       </View>
 
       <TouchableOpacity style={styles.profile} onPress={onProfilePress}>

@@ -1,22 +1,19 @@
+// components/HouseholdDropdown.tsx
 import React, { useState } from "react";
 import {
-    Button,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Button,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useHouseholds } from "../hooks/useHouseholds";
+import { useHouseholdContext } from "../context/HouseholdContext";
 
-type Props = {
-  userId: string;
-};
-
-export default function HouseholdDropdown({ userId }: Props) {
+export default function HouseholdDropdown() {
   const { households, selectedId, setSelectedId, createHousehold, leaveHousehold } =
-    useHouseholds(userId);
+    useHouseholdContext();
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [adding, setAdding] = useState(false);
@@ -40,7 +37,7 @@ export default function HouseholdDropdown({ userId }: Props) {
       {dropdownOpen && (
         <View style={styles.dropdown}>
           {households
-            .filter((h) => h.id !== selectedId) // hide current household
+            .filter((h) => h.id !== selectedId)
             .map((h) => (
               <View key={h.id} style={styles.itemRow}>
                 <Pressable
@@ -98,75 +95,17 @@ export default function HouseholdDropdown({ userId }: Props) {
 }
 
 const styles = StyleSheet.create({
-  button: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 10,
-    borderWidth: 1,
-    borderRadius: 6,
-    backgroundColor: "#fff",
-    width: "100%",
-  },
-  name: {
-    flex: 1,
-    textAlign: "center",
-  },
-  selectedName: {
-    fontWeight: "bold",
-  },
-  arrow: {
-    position: "absolute",
-    right: 10,
-  },
-  dropdown: {
-    marginTop: 6,
-    borderWidth: 1,
-    borderRadius: 6,
-    backgroundColor: "#fff",
-    width: "100%",
-  },
-  itemRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  item: {
-    flex: 1,
-    padding: 10,
-  },
-  itemText: {
-    textAlign: "center",
-  },
-  leaveButton: {
-    backgroundColor: "red",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderTopRightRadius: 4,
-    borderBottomRightRadius: 4,
-    marginRight: 4,
-  },
-  leaveButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  add: {
-    padding: 10,
-    alignItems: "center",
-    backgroundColor: "#f9f9f9",
-  },
-  addRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center", // ✅ center align input row
-    padding: 8,
-  },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    padding: 6,
-    marginRight: 6,
-    textAlign: "center", // ✅ center text in input
-  },
+  button: { flexDirection: "row", alignItems: "center", justifyContent: "center", padding: 10, borderWidth: 1, borderRadius: 6, backgroundColor: "#fff", width: "100%" },
+  name: { flex: 1, textAlign: "center" },
+  selectedName: { fontWeight: "bold" },
+  arrow: { position: "absolute", right: 10 },
+  dropdown: { marginTop: 6, borderWidth: 1, borderRadius: 6, backgroundColor: "#fff", width: "100%" },
+  itemRow: { flexDirection: "row", alignItems: "center", borderBottomWidth: 1, borderBottomColor: "#eee" },
+  item: { flex: 1, padding: 10 },
+  itemText: { textAlign: "center" },
+  leaveButton: { backgroundColor: "red", paddingHorizontal: 10, paddingVertical: 6, borderTopRightRadius: 4, borderBottomRightRadius: 4, marginRight: 4 },
+  leaveButtonText: { color: "white", fontWeight: "bold" },
+  add: { padding: 10, alignItems: "center", backgroundColor: "#f9f9f9" },
+  addRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", padding: 8 },
+  input: { flex: 1, borderWidth: 1, padding: 6, marginRight: 6, textAlign: "center" },
 });
