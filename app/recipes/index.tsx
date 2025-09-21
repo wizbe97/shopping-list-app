@@ -1,5 +1,11 @@
 import { useRouter } from "expo-router";
-import React from "react";
+import {
+    collection,
+    onSnapshot,
+    orderBy,
+    query,
+} from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import {
     FlatList,
     StyleSheet,
@@ -7,6 +13,10 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import HouseholdDropdown from "../../components/HouseholdDropdown";
+import { useAuth } from "../../hooks/useAuth";
+import { useHouseholds } from "../../hooks/useHouseholds";
+import { db } from "../../src/firebaseConfig";
 
 type Recipe = {
   id: string;
@@ -15,30 +25,55 @@ type Recipe = {
 
 export default function RecipesScreen() {
   const router = useRouter();
-  const recipes: Recipe[] = []; // start empty
+  const { userId } = useAuth();
+  const { selectedId: householdId } = useHouseholds(userId);
 
-  // Always render "Create New Recipe" plus placeholders for a grid layout
-  const data = [
-    { id: "create", name: "＋ Create New Recipe" },
-    ...recipes,
-  ];
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
 
-  // Pad data so grid always has at least 2 slots
-  while (data.length < 2) {
-    data.push({ id: `empty-${data.length}`, name: "" });
-  }
+  useEffect(() => {
+    if (!householdId) {
+      setRecipes([]);
+      return;
+    }
+
+    const q = query(
+      collection(db, "households", householdId, "recipes"),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsub = onSnapshot(q, (snap) => {
+      const list: Recipe[] = [];
+      snap.forEach((doc) =>
+        list.push({ id: doc.id, ...(doc.data() as any) })
+      );
+      setRecipes(list);
+    });
+
+    return () => unsub();
+  }, [householdId]);
+
+  const data = [{ id: "create", name: "＋ Create New Recipe" }, ...recipes];
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+        <TouchableOpacity
+          onPress={() => router.replace("/home")}
+          style={styles.backBtn}
+        >
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerText}>Recipes</Text>
+
+        {/* Household Dropdown */}
+        {userId && (
+          <View style={styles.dropdownWrapper}>
+            <HouseholdDropdown userId={userId} />
+          </View>
+        )}
       </View>
 
-      {/* Grid of tiles */}
+      {/* Grid */}
       <FlatList
         data={data}
         keyExtractor={(item) => item.id}
@@ -50,19 +85,16 @@ export default function RecipesScreen() {
             return (
               <TouchableOpacity
                 style={styles.tile}
-                onPress={() => console.log("Create recipe")}
+                onPress={() => router.push("/recipes/create" as any)}
               >
                 <Text style={styles.tileText}>{item.name}</Text>
               </TouchableOpacity>
             );
           }
-          if (item.name === "") {
-            return <View style={[styles.tile, styles.emptyTile]} />;
-          }
           return (
             <TouchableOpacity
               style={styles.tile}
-              onPress={() => console.log("Open recipe", item.id)}
+              onPress={() => router.push(`/recipes/${item.id}` as any)}
             >
               <Text style={styles.tileText}>{item.name}</Text>
             </TouchableOpacity>
@@ -82,12 +114,15 @@ const styles = StyleSheet.create({
   },
   backBtn: { marginRight: 12, padding: 4 },
   backText: { fontSize: 20, fontWeight: "bold" },
-  headerText: { fontSize: 22, fontWeight: "bold" },
+  dropdownWrapper: {
+    flex: 1,
+    marginLeft: 8,
+  },
   grid: { paddingBottom: 20 },
   row: { justifyContent: "space-between" },
   tile: {
     flex: 1,
-    aspectRatio: 1,
+    aspectRatio: 2,
     margin: 8,
     backgroundColor: "#fff",
     borderRadius: 8,
@@ -99,11 +134,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  emptyTile: {
-    backgroundColor: "#eee",
-  },
   tileText: {
-    fontSize: 18, // bumped up
+    fontSize: 18,
     fontWeight: "700",
     textAlign: "center",
   },
