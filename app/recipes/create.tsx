@@ -8,12 +8,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 import HomeHeader from "../../components/HomeHeader";
 import ScreenWrapper, { AppText } from "../../components/ScreenWrapper";
 import { useHouseholdContext } from "../../context/HouseholdContext";
 import { useAuth } from "../../hooks/useAuth";
 import { db } from "../../src/firebaseConfig";
+
+type Ingredient = { name: string; quantity: string };
 
 export default function CreateRecipeScreen() {
   const router = useRouter();
@@ -22,16 +23,22 @@ export default function CreateRecipeScreen() {
 
   const [name, setName] = useState("");
   const [serves, setServes] = useState("");
-  const [ingredients, setIngredients] = useState<string[]>([]);
+  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [steps, setSteps] = useState<string[]>([]);
 
   function addIngredient() {
-    setIngredients((prev) => [...prev, ""]);
+    setIngredients((prev) => [...prev, { name: "", quantity: "" }]);
   }
 
-  function updateIngredient(index: number, value: string) {
+  function updateIngredientName(index: number, value: string) {
     setIngredients((prev) =>
-      prev.map((item, i) => (i === index ? value : item))
+      prev.map((ing, i) => (i === index ? { ...ing, name: value } : ing))
+    );
+  }
+
+  function updateIngredientQuantity(index: number, value: string) {
+    setIngredients((prev) =>
+      prev.map((ing, i) => (i === index ? { ...ing, quantity: value } : ing))
     );
   }
 
@@ -44,9 +51,7 @@ export default function CreateRecipeScreen() {
   }
 
   function updateStep(index: number, value: string) {
-    setSteps((prev) =>
-      prev.map((item, i) => (i === index ? value : item))
-    );
+    setSteps((prev) => prev.map((s, i) => (i === index ? value : s)));
   }
 
   async function handleSave() {
@@ -55,7 +60,9 @@ export default function CreateRecipeScreen() {
     await addDoc(collection(db, "households", householdId, "recipes"), {
       name: name.trim(),
       serves: parseInt(serves, 10),
-      ingredients: ingredients.filter((i) => i.trim() !== ""),
+      ingredients: ingredients.filter(
+        (i) => i.name.trim() !== "" && i.quantity.trim() !== ""
+      ),
       steps: steps.filter((s) => s.trim() !== ""),
       createdAt: Timestamp.now(),
       createdBy: userId,
@@ -78,7 +85,6 @@ export default function CreateRecipeScreen() {
         value={name}
         onChangeText={setName}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Serves"
@@ -87,7 +93,6 @@ export default function CreateRecipeScreen() {
         onChangeText={setServes}
       />
 
-      {/* Ingredients */}
       <AppText style={styles.subHeader} fontSize={18}>
         Ingredients
       </AppText>
@@ -97,12 +102,23 @@ export default function CreateRecipeScreen() {
         keyExtractor={(_, i) => `ing-${i}`}
         renderItem={({ item, index }) => (
           <View style={styles.row}>
+            {/* Ingredient name */}
             <TextInput
-              style={[styles.input, { flex: 1, marginBottom: 0 }]}
+              style={[styles.input, styles.flexInput]}
               placeholder={`Ingredient ${index + 1}`}
-              value={item}
-              onChangeText={(text) => updateIngredient(index, text)}
+              value={item.name}
+              onChangeText={(text) => updateIngredientName(index, text)}
             />
+
+            {/* Quantity */}
+            <TextInput
+              style={[styles.input, styles.qtyInput]}
+              placeholder="Qty"
+              value={item.quantity}
+              keyboardType="numeric"
+              onChangeText={(text) => updateIngredientQuantity(index, text)}
+            />
+
             <TouchableOpacity
               style={styles.deleteBtn}
               onPress={() => removeIngredient(index)}
@@ -122,7 +138,6 @@ export default function CreateRecipeScreen() {
         }
       />
 
-      {/* Steps */}
       <AppText style={styles.subHeader} fontSize={18}>
         Steps
       </AppText>
@@ -147,7 +162,6 @@ export default function CreateRecipeScreen() {
         }
       />
 
-      {/* Save Button */}
       <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
         <AppText style={styles.saveText} fontSize={18}>
           Save Recipe
@@ -158,15 +172,8 @@ export default function CreateRecipeScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  subHeader: {
-    fontWeight: "600",
-    marginTop: 20,
-    marginBottom: 8,
-  },
+  header: { fontWeight: "bold", marginBottom: 20 },
+  subHeader: { fontWeight: "600", marginTop: 20, marginBottom: 8 },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -180,6 +187,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
+  flexInput: { flex: 2, marginBottom: 0, marginRight: 8 },
+  qtyInput: { flex: 1, marginBottom: 0 },
   deleteBtn: {
     backgroundColor: "red",
     borderRadius: 4,
@@ -187,10 +196,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginLeft: 8,
   },
-  deleteText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
+  deleteText: { color: "#fff", fontWeight: "bold" },
   addBtn: {
     padding: 10,
     backgroundColor: "#eee",
@@ -198,9 +204,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  addBtnText: {
-    fontWeight: "500",
-  },
+  addBtnText: { fontWeight: "500" },
   saveBtn: {
     backgroundColor: "#007AFF",
     padding: 16,
@@ -208,8 +212,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
-  saveText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
+  saveText: { color: "#fff", fontWeight: "bold" },
 });
