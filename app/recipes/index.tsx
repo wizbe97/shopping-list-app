@@ -16,7 +16,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import HouseholdDropdown from "../../components/HouseholdDropdown";
+import AuthDrawer from "../../components/AuthDrawer";
+import HomeHeader from "../../components/HomeHeader";
+import ScreenWrapper from "../../components/ScreenWrapper";
 import { useHouseholdContext } from "../../context/HouseholdContext";
 import { useAuth } from "../../hooks/useAuth";
 import { db } from "../../src/firebaseConfig";
@@ -28,10 +30,11 @@ type Recipe = {
 
 export default function RecipesScreen() {
   const router = useRouter();
-  const { userId } = useAuth();
+  const { userId, userName } = useAuth();
   const { selectedId: householdId } = useHouseholdContext();
 
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     if (!householdId) {
@@ -60,37 +63,23 @@ export default function RecipesScreen() {
     await deleteDoc(doc(db, "households", householdId, "recipes", recipeId));
   }
 
-  // Always start with "create" tile
   let data: (Recipe & { type?: string })[] = [
     { id: "create", name: "＋ Create New Recipe", type: "create" },
     ...recipes,
   ];
 
-  // If odd, add placeholder tile
   if (data.length % 2 !== 0) {
     data.push({ id: "placeholder", name: "", type: "placeholder" });
   }
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.replace("/home")}
-          style={styles.backBtn}
-        >
-          <Text style={styles.backText}>←</Text>
-        </TouchableOpacity>
+    <ScreenWrapper>
+      <HomeHeader
+        showBack
+        onBackPress={() => router.replace("/home")}
+        onProfilePress={() => setDrawerOpen(true)}
+      />
 
-        {/* Household Dropdown */}
-        {userId && (
-          <View style={styles.dropdownWrapper}>
-            <HouseholdDropdown />
-          </View>
-        )}
-      </View>
-
-      {/* Grid */}
       <FlatList
         data={data}
         keyExtractor={(item) => item.id}
@@ -114,8 +103,11 @@ export default function RecipesScreen() {
           }
 
           return (
-            <View style={styles.tile}>
-              {/* Delete button */}
+            <TouchableOpacity
+              style={styles.tile}
+              onPress={() => router.push(`/recipes/${item.id}` as any)}
+              activeOpacity={0.8}
+            >
               <TouchableOpacity
                 style={styles.deleteBtn}
                 onPress={() => handleDelete(item.id)}
@@ -123,34 +115,23 @@ export default function RecipesScreen() {
                 <Text style={styles.deleteText}>✕</Text>
               </TouchableOpacity>
 
-              {/* Recipe name (tap to edit) */}
-              <TouchableOpacity
-                style={styles.tileContent}
-                onPress={() => router.push(`/recipes/${item.id}` as any)}
-              >
-                <Text style={styles.tileText}>{item.name}</Text>
-              </TouchableOpacity>
-            </View>
+              <Text style={styles.tileText}>{item.name}</Text>
+            </TouchableOpacity>
           );
         }}
       />
-    </View>
+
+      <AuthDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        userName={userName}
+        onLoggedOut={() => {}}
+      />
+    </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7", padding: 16 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  backBtn: { marginRight: 12, padding: 4 },
-  backText: { fontSize: 20, fontWeight: "bold" },
-  dropdownWrapper: {
-    flex: 1,
-    marginLeft: 8,
-  },
   grid: { paddingBottom: 20 },
   row: { justifyContent: "space-between" },
   tile: {
@@ -166,21 +147,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 3,
-    position: "relative", // needed for delete button
+    position: "relative",
   },
-  tileContent: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  tileText: {
-    fontSize: 18,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  placeholder: {
-    backgroundColor: "#e0e0e0", // slightly darker than recipes
-  },
+  tileText: { fontSize: 18, fontWeight: "700", textAlign: "center" },
+  placeholder: { backgroundColor: "#e0e0e0" },
   deleteBtn: {
     position: "absolute",
     top: 6,
@@ -191,9 +161,5 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     zIndex: 1,
   },
-  deleteText: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "bold",
-  },
+  deleteText: { color: "#fff", fontSize: 14, fontWeight: "bold" },
 });

@@ -38,15 +38,24 @@ export function useHouseholds(userId: string | null) {
     return () => unsub();
   }, [userId]);
 
-  async function createHousehold(name: string) {
-    if (!userId || !name.trim()) return;
-    await addDoc(collection(db, "households"), {
+  /**
+   * Create a new household for this user and return its ID.
+   */
+  async function createHousehold(name: string): Promise<string | null> {
+    if (!userId || !name.trim()) return null;
+
+    const docRef = await addDoc(collection(db, "households"), {
       name: name.trim(),
       members: [userId],
       createdAt: Timestamp.now(),
     });
+
+    return docRef.id; // 👈 return the ID so HouseholdContext can auto-select it
   }
 
+  /**
+   * Remove this user from a household.
+   */
   async function leaveHousehold(householdId: string) {
     if (!userId) return;
     const ref = doc(db, "households", householdId);

@@ -7,11 +7,13 @@ type HouseholdContextType = {
   households: Household[];
   selectedId: string | null;
   setSelectedId: (id: string | null) => void;
-  createHousehold: (name: string) => Promise<void>;
+  createHousehold: (name: string) => Promise<string | null>; // now returns id
   leaveHousehold: (id: string) => Promise<void>;
 };
 
-const HouseholdContext = createContext<HouseholdContextType | undefined>(undefined);
+const HouseholdContext = createContext<HouseholdContextType | undefined>(
+  undefined
+);
 
 export function HouseholdProvider({
   userId,
@@ -70,6 +72,7 @@ export function HouseholdProvider({
 
 export function useHouseholdContext() {
   const ctx = useContext(HouseholdContext);
-  if (!ctx) throw new Error("useHouseholdContext must be used inside HouseholdProvider");
+  if (!ctx)
+    throw new Error("useHouseholdContext must be used inside HouseholdProvider");
   return ctx;
 }

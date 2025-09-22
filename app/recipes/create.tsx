@@ -10,6 +10,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import HomeHeader from "../../components/HomeHeader";
+import ScreenWrapper from "../../components/ScreenWrapper";
 import { useHouseholdContext } from "../../context/HouseholdContext";
 import { useAuth } from "../../hooks/useAuth";
 import { db } from "../../src/firebaseConfig";
@@ -32,6 +34,10 @@ export default function CreateRecipeScreen() {
     setIngredients((prev) =>
       prev.map((item, i) => (i === index ? value : item))
     );
+  }
+
+  function removeIngredient(index: number) {
+    setIngredients((prev) => prev.filter((_, i) => i !== index));
   }
 
   function addStep() {
@@ -58,10 +64,8 @@ export default function CreateRecipeScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-        <Text style={styles.backText}>←</Text>
-      </TouchableOpacity>
+    <ScreenWrapper>
+      <HomeHeader showBack onBackPress={() => router.back()} />
 
       <Text style={styles.header}>New Recipe</Text>
 
@@ -85,12 +89,20 @@ export default function CreateRecipeScreen() {
         data={ingredients}
         keyExtractor={(_, i) => `ing-${i}`}
         renderItem={({ item, index }) => (
-          <TextInput
-            style={styles.input}
-            placeholder={`Ingredient ${index + 1}`}
-            value={item}
-            onChangeText={(text) => updateIngredient(index, text)}
-          />
+          <View style={styles.row}>
+            <TextInput
+              style={[styles.input, { flex: 1, marginBottom: 0 }]}
+              placeholder={`Ingredient ${index + 1}`}
+              value={item}
+              onChangeText={(text) => updateIngredient(index, text)}
+            />
+            <TouchableOpacity
+              style={styles.deleteBtn}
+              onPress={() => removeIngredient(index)}
+            >
+              <Text style={styles.deleteText}>✕</Text>
+            </TouchableOpacity>
+          </View>
         )}
         ListFooterComponent={
           <TouchableOpacity onPress={addIngredient} style={styles.addBtn}>
@@ -121,14 +133,11 @@ export default function CreateRecipeScreen() {
       <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
         <Text style={styles.saveText}>Save Recipe</Text>
       </TouchableOpacity>
-    </View>
+    </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7", padding: 16 },
-  backBtn: { marginBottom: 12 },
-  backText: { fontSize: 20, fontWeight: "bold" },
   header: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
   subHeader: { fontSize: 18, fontWeight: "600", marginTop: 20, marginBottom: 8 },
   input: {
@@ -140,6 +149,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: "#fff",
   },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  deleteBtn: {
+    backgroundColor: "red",
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginLeft: 8,
+  },
+  deleteText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
   addBtn: {
     padding: 10,
     backgroundColor: "#eee",
