@@ -4,12 +4,12 @@ import {
   Button,
   Pressable,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useHouseholdContext } from "../context/HouseholdContext";
+import { AppText } from "./ScreenWrapper";
 
 export default function HouseholdDropdown() {
   const {
@@ -33,10 +33,12 @@ export default function HouseholdDropdown() {
         style={styles.button}
         onPress={() => setDropdownOpen(!dropdownOpen)}
       >
-        <Text style={[styles.name, styles.selectedName]}>
+        <AppText style={[styles.name, styles.selectedName]} fontSize={16}>
           {selected ? selected.name : "Select Household"}
-        </Text>
-        <Text style={styles.arrow}>▼</Text>
+        </AppText>
+        <AppText style={styles.arrow} fontSize={14}>
+          ▼
+        </AppText>
       </TouchableOpacity>
 
       {dropdownOpen && (
@@ -55,21 +57,28 @@ export default function HouseholdDropdown() {
                     setDropdownOpen(false);
                   }}
                 >
-                  <Text style={styles.itemText}>{h.name}</Text>
+                  <AppText style={styles.itemText} fontSize={16}>
+                    {h.name}
+                  </AppText>
                 </Pressable>
 
                 <TouchableOpacity
                   style={styles.leaveButton}
                   onPress={() => leaveHousehold(h.id)}
                 >
-                  <Text style={styles.leaveButtonText}>✕</Text>
+                  <AppText style={styles.leaveButtonText} fontSize={14}>
+                    ✕
+                  </AppText>
                 </TouchableOpacity>
               </View>
             ))}
 
           {!adding ? (
-            <TouchableOpacity style={styles.add} onPress={() => setAdding(true)}>
-              <Text>➕ Add a new household</Text>
+            <TouchableOpacity
+              style={styles.add}
+              onPress={() => setAdding(true)}
+            >
+              <AppText fontSize={14}>➕ Add a new household</AppText>
             </TouchableOpacity>
           ) : (
             <View style={styles.addRow}>

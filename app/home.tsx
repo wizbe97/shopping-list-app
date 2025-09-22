@@ -1,11 +1,12 @@
-// app/home.tsx
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { FlatList, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity } from "react-native";
+
 import AuthDrawer from "../components/AuthDrawer";
 import AuthForm from "../components/AuthForm";
 import HomeHeader from "../components/HomeHeader";
-import ScreenWrapper from "../components/ScreenWrapper";
+import InviteButton from "../components/InviteButton"; // 👈 import
+import ScreenWrapper, { AppText } from "../components/ScreenWrapper";
 import { HouseholdProvider } from "../context/HouseholdContext";
 import { useAuth } from "../hooks/useAuth";
 
@@ -28,6 +29,9 @@ export default function Home() {
       <ScreenWrapper>
         <HomeHeader onProfilePress={() => setDrawerOpen(true)} />
 
+        {/* 👇 Invite button placed under dropdown/header */}
+        <InviteButton />
+
         <FlatList
           data={data}
           keyExtractor={(item) => item.id}
@@ -39,7 +43,9 @@ export default function Home() {
               style={styles.tile}
               onPress={() => router.push(item.route as any)}
             >
-              <Text style={styles.tileText}>{item.label}</Text>
+              <AppText style={styles.tileText} fontSize={20}>
+                {item.label}
+              </AppText>
             </TouchableOpacity>
           )}
         />
@@ -56,8 +62,12 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  grid: { paddingBottom: 20 },
-  row: { justifyContent: "space-between" },
+  grid: {
+    paddingBottom: 20,
+  },
+  row: {
+    justifyContent: "space-between",
+  },
   tile: {
     flex: 1,
     aspectRatio: 2,
@@ -72,5 +82,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  tileText: { fontSize: 20, fontWeight: "700", textAlign: "center" },
+  tileText: {
+    fontWeight: "700",
+    textAlign: "center",
+  },
 });

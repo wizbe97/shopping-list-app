@@ -1,9 +1,7 @@
-// components/HomeHeader.tsx
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import HouseholdDropdown from "./HouseholdDropdown";
-import InviteButton from "./InviteButton";
 
 type Props = {
   showBack?: boolean;
@@ -11,49 +9,57 @@ type Props = {
   onProfilePress?: () => void;
 };
 
-export default function HomeHeader({ showBack, onBackPress, onProfilePress }: Props) {
+export default function HomeHeader({
+  showBack,
+  onBackPress,
+  onProfilePress,
+}: Props) {
   return (
     <View style={styles.container}>
-      {/* Row: Back button (optional) + Dropdown + Profile */}
-      <View style={styles.topRow}>
+      {/* Back button + Dropdown */}
+      <View style={styles.row}>
         {showBack ? (
           <TouchableOpacity onPress={onBackPress} style={styles.backBtn}>
-            <Text style={styles.backText}>←</Text>
+            <Ionicons name="arrow-back" size={28} color="#000" />
           </TouchableOpacity>
         ) : (
-          <View style={{ width: 24 }} /> // spacer if no back button
+          <View style={{ width: 28 }} /> // spacer
         )}
 
         <View style={styles.dropdownWrapper}>
           <HouseholdDropdown />
         </View>
-
-        <TouchableOpacity onPress={onProfilePress} style={styles.profileBtn}>
-          <Ionicons name="person-circle" size={28} color="#000" />
-        </TouchableOpacity>
       </View>
 
-      {/* Centered Invite button */}
-      <View style={styles.inviteWrapper}>
-        <InviteButton />
-      </View>
+      {/* Profile button stays pinned top-right */}
+      <TouchableOpacity onPress={onProfilePress} style={styles.profileBtn}>
+        <Ionicons name="person-circle" size={36} color="#000" />
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { marginBottom: 16 },
-  topRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+  container: {
+    marginBottom: 16,
+    position: "relative", // needed for absolute child
   },
-  backBtn: { padding: 4, marginRight: 8 },
-  backText: { fontSize: 20, fontWeight: "bold" },
-  dropdownWrapper: { flex: 1, marginHorizontal: 8 },
-  profileBtn: { padding: 4, marginLeft: 8 },
-  inviteWrapper: {
-    marginTop: 12,
-    alignItems: "center", // 👈 centers Invite button
+  row: {
+    flexDirection: "row",
+    alignItems: "flex-start", // 👈 align to top instead of center
+  },
+  backBtn: {
+    padding: 4,
+    marginRight: 8,
+  },
+  dropdownWrapper: {
+    flex: 1,
+    marginRight: 48, // leave space so profile button doesn’t overlap
+  },
+  profileBtn: {
+    position: "absolute",
+    top: 0, // 👈 pinned to top
+    right: 0,
+    padding: 4,
   },
 });

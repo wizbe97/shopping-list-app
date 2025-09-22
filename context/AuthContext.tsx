@@ -1,19 +1,30 @@
+import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   updateProfile,
+  User,
 } from "firebase/auth";
-import { useEffect, useState } from "react";
 import { auth } from "../src/firebaseConfig";
 
-export function useAuth() {
+type AuthContextType = {
+  userId: string | null;
+  userName: string | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
+};
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true); // starts true until Firebase checks
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (u) => {
+    const unsub = onAuthStateChanged(auth, async (u: User | null) => {
       if (u) {
         try {
           await u.reload();
@@ -26,7 +37,7 @@ export function useAuth() {
         setUserId(null);
         setUserName(null);
       }
-      setLoading(false); // ✅ only after Firebase finishes checking cached auth
+      setLoading(false);
     });
 
     return unsub;
@@ -51,5 +62,15 @@ export function useAuth() {
     }
   }
 
-  return { userId, userName, login, register, loading };
+  return (
+    <AuthContext.Provider value={{ userId, userName, loading, login, register }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
+  return ctx;
 }

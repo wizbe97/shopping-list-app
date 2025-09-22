@@ -1,4 +1,3 @@
-// app/recipes/index.tsx
 import { useRouter } from "expo-router";
 import {
   collection,
@@ -12,13 +11,13 @@ import React, { useEffect, useState } from "react";
 import {
   FlatList,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
+
 import AuthDrawer from "../../components/AuthDrawer";
 import HomeHeader from "../../components/HomeHeader";
-import ScreenWrapper from "../../components/ScreenWrapper";
+import ScreenWrapper, { AppText } from "../../components/ScreenWrapper";
 import { useHouseholdContext } from "../../context/HouseholdContext";
 import { useAuth } from "../../hooks/useAuth";
 import { db } from "../../src/firebaseConfig";
@@ -76,7 +75,8 @@ export default function RecipesScreen() {
     <ScreenWrapper>
       <HomeHeader
         showBack
-        onBackPress={() => router.replace("/home")}
+        // ✅ Use router.back instead of replace to avoid flicker
+        onBackPress={() => router.back()}
         onProfilePress={() => setDrawerOpen(true)}
       />
 
@@ -97,7 +97,9 @@ export default function RecipesScreen() {
                 style={styles.tile}
                 onPress={() => router.push("/recipes/create" as any)}
               >
-                <Text style={styles.tileText}>{item.name}</Text>
+                <AppText style={styles.tileText} fontSize={18}>
+                  {item.name}
+                </AppText>
               </TouchableOpacity>
             );
           }
@@ -112,10 +114,13 @@ export default function RecipesScreen() {
                 style={styles.deleteBtn}
                 onPress={() => handleDelete(item.id)}
               >
-                <Text style={styles.deleteText}>✕</Text>
+                <AppText style={styles.deleteText} fontSize={14}>
+                  ✕
+                </AppText>
               </TouchableOpacity>
-
-              <Text style={styles.tileText}>{item.name}</Text>
+              <AppText style={styles.tileText} fontSize={18}>
+                {item.name}
+              </AppText>
             </TouchableOpacity>
           );
         }}
@@ -132,8 +137,12 @@ export default function RecipesScreen() {
 }
 
 const styles = StyleSheet.create({
-  grid: { paddingBottom: 20 },
-  row: { justifyContent: "space-between" },
+  grid: {
+    paddingBottom: 20,
+  },
+  row: {
+    justifyContent: "space-between",
+  },
   tile: {
     flex: 1,
     aspectRatio: 2,
@@ -149,8 +158,13 @@ const styles = StyleSheet.create({
     elevation: 3,
     position: "relative",
   },
-  tileText: { fontSize: 18, fontWeight: "700", textAlign: "center" },
-  placeholder: { backgroundColor: "#e0e0e0" },
+  tileText: {
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  placeholder: {
+    backgroundColor: "#e0e0e0",
+  },
   deleteBtn: {
     position: "absolute",
     top: 6,
@@ -161,5 +175,8 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     zIndex: 1,
   },
-  deleteText: { color: "#fff", fontSize: 14, fontWeight: "bold" },
+  deleteText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
 });

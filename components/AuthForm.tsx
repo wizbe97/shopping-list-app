@@ -1,6 +1,13 @@
+// components/AuthForm.tsx
 import React, { useState } from "react";
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useAuth } from "../hooks/useAuth";
+import { AppText } from "./ScreenWrapper";
 
 type AuthFormProps = {
   onSuccess?: () => void;
@@ -54,20 +61,20 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
         />
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>
+          <AppText style={styles.buttonText} fontSize={16}>
             {isRegister ? "Register" : "Login"}
-          </Text>
+          </AppText>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => setIsRegister(!isRegister)}
           style={styles.toggle}
         >
-          <Text style={styles.toggleText}>
+          <AppText style={styles.toggleText} fontSize={14}>
             {isRegister
               ? "Already have an account? Login"
               : "Need an account? Register"}
-          </Text>
+          </AppText>
         </TouchableOpacity>
       </View>
     </View>
@@ -110,7 +117,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "center",
     fontWeight: "bold",
-    fontSize: 16,
   },
   toggle: {
     marginTop: 16,

@@ -1,4 +1,3 @@
-// app/recipes/[id].tsx
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { doc, getDoc, Timestamp, updateDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
@@ -6,13 +5,13 @@ import {
   ActivityIndicator,
   FlatList,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+
 import HomeHeader from "../../components/HomeHeader";
-import ScreenWrapper from "../../components/ScreenWrapper";
+import ScreenWrapper, { AppText } from "../../components/ScreenWrapper";
 import { useHouseholdContext } from "../../context/HouseholdContext";
 import { useAuth } from "../../hooks/useAuth";
 import { db } from "../../src/firebaseConfig";
@@ -32,8 +31,10 @@ export default function EditRecipeScreen() {
   useEffect(() => {
     async function fetchRecipe() {
       if (!householdId || !id) return;
+
       const ref = doc(db, "households", householdId, "recipes", id);
       const snap = await getDoc(ref);
+
       if (snap.exists()) {
         const data = snap.data();
         setName(data.name || "");
@@ -41,8 +42,10 @@ export default function EditRecipeScreen() {
         setIngredients(data.ingredients || []);
         setSteps(data.steps || []);
       }
+
       setLoading(false);
     }
+
     fetchRecipe();
   }, [householdId, id]);
 
@@ -65,13 +68,16 @@ export default function EditRecipeScreen() {
   }
 
   function updateStep(index: number, value: string) {
-    setSteps((prev) => prev.map((item, i) => (i === index ? value : item)));
+    setSteps((prev) =>
+      prev.map((item, i) => (i === index ? value : item))
+    );
   }
 
   async function handleSave() {
     if (!name.trim() || !serves.trim() || !householdId || !id) return;
 
     const ref = doc(db, "households", householdId, "recipes", id);
+
     await updateDoc(ref, {
       name: name.trim(),
       serves: parseInt(serves, 10),
@@ -88,7 +94,7 @@ export default function EditRecipeScreen() {
     return (
       <ScreenWrapper>
         <ActivityIndicator size="large" />
-        <Text>Loading recipe...</Text>
+        <AppText fontSize={16}>Loading recipe...</AppText>
       </ScreenWrapper>
     );
   }
@@ -97,7 +103,9 @@ export default function EditRecipeScreen() {
     <ScreenWrapper>
       <HomeHeader showBack onBackPress={() => router.back()} />
 
-      <Text style={styles.header}>Edit Recipe</Text>
+      <AppText style={styles.header} fontSize={22}>
+        Edit Recipe
+      </AppText>
 
       <TextInput
         style={styles.input}
@@ -114,7 +122,11 @@ export default function EditRecipeScreen() {
         onChangeText={setServes}
       />
 
-      <Text style={styles.subHeader}>Ingredients</Text>
+      {/* Ingredients */}
+      <AppText style={styles.subHeader} fontSize={18}>
+        Ingredients
+      </AppText>
+
       <FlatList
         data={ingredients}
         keyExtractor={(_, i) => `ing-${i}`}
@@ -130,18 +142,26 @@ export default function EditRecipeScreen() {
               style={styles.deleteBtn}
               onPress={() => removeIngredient(index)}
             >
-              <Text style={styles.deleteText}>✕</Text>
+              <AppText style={styles.deleteText} fontSize={16}>
+                ✕
+              </AppText>
             </TouchableOpacity>
           </View>
         )}
         ListFooterComponent={
           <TouchableOpacity onPress={addIngredient} style={styles.addBtn}>
-            <Text style={styles.addBtnText}>+ Add Ingredient</Text>
+            <AppText style={styles.addBtnText} fontSize={16}>
+              + Add Ingredient
+            </AppText>
           </TouchableOpacity>
         }
       />
 
-      <Text style={styles.subHeader}>Steps</Text>
+      {/* Steps */}
+      <AppText style={styles.subHeader} fontSize={18}>
+        Steps
+      </AppText>
+
       <FlatList
         data={steps}
         keyExtractor={(_, i) => `step-${i}`}
@@ -155,28 +175,39 @@ export default function EditRecipeScreen() {
         )}
         ListFooterComponent={
           <TouchableOpacity onPress={addStep} style={styles.addBtn}>
-            <Text style={styles.addBtnText}>+ Add Step</Text>
+            <AppText style={styles.addBtnText} fontSize={16}>
+              + Add Step
+            </AppText>
           </TouchableOpacity>
         }
       />
 
+      {/* Save Button */}
       <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-        <Text style={styles.saveText}>Save Changes</Text>
+        <AppText style={styles.saveText} fontSize={18}>
+          Save Changes
+        </AppText>
       </TouchableOpacity>
     </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  header: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
-  subHeader: { fontSize: 18, fontWeight: "600", marginTop: 20, marginBottom: 8 },
+  header: {
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  subHeader: {
+    fontWeight: "600",
+    marginTop: 20,
+    marginBottom: 8,
+  },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 6,
     padding: 10,
     marginBottom: 12,
-    fontSize: 16,
     backgroundColor: "#fff",
   },
   row: {
@@ -191,7 +222,10 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginLeft: 8,
   },
-  deleteText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  deleteText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
   addBtn: {
     padding: 10,
     backgroundColor: "#eee",
@@ -199,7 +233,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  addBtnText: { fontSize: 16, fontWeight: "500" },
+  addBtnText: {
+    fontWeight: "500",
+  },
   saveBtn: {
     backgroundColor: "#007AFF",
     padding: 16,
@@ -207,5 +243,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
-  saveText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+  saveText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
 });

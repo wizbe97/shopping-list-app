@@ -9,6 +9,13 @@ export default function ShoppingList() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center" },
-  text: { fontSize: 20, fontWeight: "600" },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  text: {
+    fontSize: 20,
+    fontWeight: "600",
+  },
 });

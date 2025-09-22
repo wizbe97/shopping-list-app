@@ -1,17 +1,16 @@
-// app/recipes/create.tsx
 import { useRouter } from "expo-router";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 import React, { useState } from "react";
 import {
   FlatList,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+
 import HomeHeader from "../../components/HomeHeader";
-import ScreenWrapper from "../../components/ScreenWrapper";
+import ScreenWrapper, { AppText } from "../../components/ScreenWrapper";
 import { useHouseholdContext } from "../../context/HouseholdContext";
 import { useAuth } from "../../hooks/useAuth";
 import { db } from "../../src/firebaseConfig";
@@ -45,7 +44,9 @@ export default function CreateRecipeScreen() {
   }
 
   function updateStep(index: number, value: string) {
-    setSteps((prev) => prev.map((item, i) => (i === index ? value : item)));
+    setSteps((prev) =>
+      prev.map((item, i) => (i === index ? value : item))
+    );
   }
 
   async function handleSave() {
@@ -67,7 +68,9 @@ export default function CreateRecipeScreen() {
     <ScreenWrapper>
       <HomeHeader showBack onBackPress={() => router.back()} />
 
-      <Text style={styles.header}>New Recipe</Text>
+      <AppText style={styles.header} fontSize={22}>
+        New Recipe
+      </AppText>
 
       <TextInput
         style={styles.input}
@@ -84,7 +87,11 @@ export default function CreateRecipeScreen() {
         onChangeText={setServes}
       />
 
-      <Text style={styles.subHeader}>Ingredients</Text>
+      {/* Ingredients */}
+      <AppText style={styles.subHeader} fontSize={18}>
+        Ingredients
+      </AppText>
+
       <FlatList
         data={ingredients}
         keyExtractor={(_, i) => `ing-${i}`}
@@ -100,18 +107,26 @@ export default function CreateRecipeScreen() {
               style={styles.deleteBtn}
               onPress={() => removeIngredient(index)}
             >
-              <Text style={styles.deleteText}>✕</Text>
+              <AppText style={styles.deleteText} fontSize={16}>
+                ✕
+              </AppText>
             </TouchableOpacity>
           </View>
         )}
         ListFooterComponent={
           <TouchableOpacity onPress={addIngredient} style={styles.addBtn}>
-            <Text style={styles.addBtnText}>+ Add Ingredient</Text>
+            <AppText style={styles.addBtnText} fontSize={16}>
+              + Add Ingredient
+            </AppText>
           </TouchableOpacity>
         }
       />
 
-      <Text style={styles.subHeader}>Steps</Text>
+      {/* Steps */}
+      <AppText style={styles.subHeader} fontSize={18}>
+        Steps
+      </AppText>
+
       <FlatList
         data={steps}
         keyExtractor={(_, i) => `step-${i}`}
@@ -125,28 +140,39 @@ export default function CreateRecipeScreen() {
         )}
         ListFooterComponent={
           <TouchableOpacity onPress={addStep} style={styles.addBtn}>
-            <Text style={styles.addBtnText}>+ Add Step</Text>
+            <AppText style={styles.addBtnText} fontSize={16}>
+              + Add Step
+            </AppText>
           </TouchableOpacity>
         }
       />
 
+      {/* Save Button */}
       <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
-        <Text style={styles.saveText}>Save Recipe</Text>
+        <AppText style={styles.saveText} fontSize={18}>
+          Save Recipe
+        </AppText>
       </TouchableOpacity>
     </ScreenWrapper>
   );
 }
 
 const styles = StyleSheet.create({
-  header: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
-  subHeader: { fontSize: 18, fontWeight: "600", marginTop: 20, marginBottom: 8 },
+  header: {
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  subHeader: {
+    fontWeight: "600",
+    marginTop: 20,
+    marginBottom: 8,
+  },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 6,
     padding: 10,
     marginBottom: 12,
-    fontSize: 16,
     backgroundColor: "#fff",
   },
   row: {
@@ -161,7 +187,10 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     marginLeft: 8,
   },
-  deleteText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  deleteText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
   addBtn: {
     padding: 10,
     backgroundColor: "#eee",
@@ -169,7 +198,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  addBtnText: { fontSize: 16, fontWeight: "500" },
+  addBtnText: {
+    fontWeight: "500",
+  },
   saveBtn: {
     backgroundColor: "#007AFF",
     padding: 16,
@@ -177,5 +208,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
-  saveText: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+  saveText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
 });
